@@ -1,0 +1,8 @@
+# What is that ?
+This is my journal to save my progress and help me keep consistent with it.
+
+# Journal
+- 2026-05-15
+1. Initialized project cargo + Dockerfile
+2. Read article (GeeksForGeeks) to start my journey with p2p networks.
+3. Read bittorrent spec https://bittorrent.org/beps/bep_0003.html
