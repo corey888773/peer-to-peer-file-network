@@ -1,1 +1,3 @@
-/target
+crates/bencoding/target
+target
+.DS_Store
