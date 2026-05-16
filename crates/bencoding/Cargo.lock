@@ -5,7 +5,3 @@ version = 4
 [[package]]
 name = "bencoding"
 version = "0.1.0"
-
-[[package]]
-name = "peer-to-peer-file-network"
-version = "0.1.0"
