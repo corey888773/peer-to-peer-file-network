@@ -1,30 +1,31 @@
-use serde::Deserialize;
+use bencoding::{Value, from_json};
+use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Serialize)]
 pub struct File {
-    pub length: u64,
+    pub length: i64,
     pub path: Vec<String>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Serialize)]
 #[serde(untagged)]
 pub enum Mode {
-    SingeFile { length: u64 },
+    SingeFile { length: i64 },
     MultiFile { files: Vec<File> },
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Serialize)]
 pub struct Info {
     // In the single file case, the name key is the name of a file, in the muliple file case, it's the name of a directory.
     pub name: String,
-    pub piece_length: u32,
+    pub piece_length: i64,
     pub pieces: String,
     // There is also a key length or a key files, but not both or neither.
     // If length is present then the download represents a single file, otherwise it represents a set of files which go in a directory structure.
     pub mode: Mode,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Serialize)]
 pub struct MetaFile {
     pub announce: String,
     pub info: Info,
