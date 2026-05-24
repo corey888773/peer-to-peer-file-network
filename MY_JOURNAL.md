@@ -8,3 +8,9 @@ This is my journal to save my progress and help me keep consistent with it.
 3. Read bittorrent spec https://bittorrent.org/beps/bep_0003.html.
 - 2025-05-16
 1. Created bencoding crate.
+- 2025-05-17
+1. Created the meta crate.
+- 2025-05-24
+1. Implemented the metafile struct
+2. Linked it with bencoding crate
+3. Crated basic happypath test
