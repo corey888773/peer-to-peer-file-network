@@ -30,3 +30,30 @@ pub struct MetaFile {
     pub announce: String,
     pub info: Info,
 }
+
+impl From<&MetaFile> for Value {
+    fn from(value: &MetaFile) -> Self {
+        let json: serde_json::Value =
+            serde_json::to_value(value).expect("serialization shouldn't fail");
+        from_json(json)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn happypath_bencoded_file_from_meta_file() -> Result<(), Box<dyn std::error::Error>> {
+        let _ = Value::from(&MetaFile {
+            announce: String::from(""),
+            info: Info {
+                name: String::from(""),
+                piece_length: 10,
+                pieces: String::from(""),
+                mode: Mode::SingeFile { length: 10 },
+            },
+        });
+        Ok(())
+    }
+}
