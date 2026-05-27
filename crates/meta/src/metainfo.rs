@@ -1,4 +1,4 @@
-use bencoding::{Value, from_json};
+use bencoding::{Value, to_value};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug, Serialize)]
@@ -33,9 +33,7 @@ pub struct MetaFile {
 
 impl From<&MetaFile> for Value {
     fn from(value: &MetaFile) -> Self {
-        let json: serde_json::Value =
-            serde_json::to_value(value).expect("serialization shouldn't fail");
-        from_json(json)
+        to_value(value)
     }
 }
 

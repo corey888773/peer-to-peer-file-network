@@ -1,4 +1,4 @@
-use bencoding::{Value, from_json};
+use bencoding::{Value, to_value};
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Debug, Serialize)]
@@ -15,9 +15,7 @@ pub struct Request {
 
 impl From<&Request> for Value {
     fn from(value: &Request) -> Self {
-        let json: serde_json::Value =
-            serde_json::to_value(value).expect("serialization shouldn't fail");
-        from_json(json)
+        to_value(value)
     }
 }
 
@@ -46,9 +44,7 @@ pub enum Response {
 
 impl From<&Response> for Value {
     fn from(value: &Response) -> Self {
-        let json: serde_json::Value =
-            serde_json::to_value(value).expect("serialization shouldn't fail");
-        from_json(json)
+        to_value(value)
     }
 }
 

@@ -1,3 +1,4 @@
+use serde::Serialize;
 use serde_json::Value as Json;
 use std::collections::HashMap;
 use std::fmt::Write;
@@ -52,7 +53,7 @@ fn encode_list(value: &Vec<Value>) -> String {
     out
 }
 
-pub fn from_json(j: Json) -> Value {
+fn from_json(j: Json) -> Value {
     match j {
         Json::String(s) => Value::Str(s),
         Json::Number(n) => Value::Int(n.as_i64().expect("bencode supports only integers")),
@@ -61,6 +62,10 @@ pub fn from_json(j: Json) -> Value {
         Json::Bool(_) => panic!("bencode doesn't support bool"),
         Json::Null => panic!("bencode doesn't support null"),
     }
+}
+
+pub fn to_value<T: Serialize>(value: &T) -> Value {
+    from_json(serde_json::to_value(value).expect("Serialization shouldn't fail"))
 }
 
 #[cfg(test)]
