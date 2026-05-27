@@ -14,3 +14,6 @@ This is my journal to save my progress and help me keep consistent with it.
 1. Implemented the metafile struct
 2. Linked it with bencoding crate
 3. Crated basic happypath test
+- 2025-05-27
+1. Trackers Requests/Responses
+2. Created generic to_value method for bencoding Value type
