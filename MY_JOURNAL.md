@@ -17,3 +17,7 @@ This is my journal to save my progress and help me keep consistent with it.
 - 2025-05-27
 1. Trackers Requests/Responses
 2. Created generic to_value method for bencoding Value type
+- 2025-06-02
+1. Protocol crate
+2. Tcp Handshake
+3. Protocol messgae types and their serialization methods
