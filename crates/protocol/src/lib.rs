@@ -1,3 +1,151 @@
+struct Bitfield {
+    mask: Vec<u8>,
+}
+impl Bitfield {
+    fn has_piece(&self, index: u32) -> bool {
+        let byte = index / 8;
+        let bit = index % 8;
+
+        (1 << 7 - bit) & self.mask[byte as usize] != 0
+    }
+
+    fn set_piece(&mut self, index: u32) {
+        let byte = index / 8;
+        let bit = index % 8;
+
+        self.mask[byte as usize] |= 1 << (7 - bit)
+    }
+
+    fn payload(&self) -> Vec<u8> {
+        self.mask.clone()
+    }
+
+    fn from_buffer(buffer: Vec<u8>) -> Self {
+        Self { mask: buffer }
+    }
+}
+
+struct Request {
+    index: u32,
+    begin: u32,
+    length: u32,
+}
+
+impl Request {
+    fn payload(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        buffer.extend_from_slice(&self.index.to_be_bytes());
+        buffer.extend_from_slice(&self.begin.to_be_bytes());
+        buffer.extend_from_slice(&self.length.to_be_bytes());
+        buffer
+    }
+
+    fn from_buffer(buffer: Vec<u8>) -> Result<Self, Box<dyn std::error::Error>> {
+        let index: u32 = u32::from_be_bytes(buffer[0..4].try_into()?);
+        let begin: u32 = u32::from_be_bytes(buffer[4..8].try_into()?);
+        let length: u32 = u32::from_be_bytes(buffer[8..12].try_into()?);
+
+        Ok(Self {
+            index,
+            begin,
+            length,
+        })
+    }
+}
+
+struct Piece {
+    index: u32,
+    begin: u32,
+    block: Vec<u8>,
+}
+
+impl Piece {
+    fn payload(&self) -> Vec<u8> {
+        let mut buffer = Vec::new();
+        buffer.extend_from_slice(&self.index.to_be_bytes());
+        buffer.extend_from_slice(&self.begin.to_be_bytes());
+        buffer.extend_from_slice(&self.block);
+        buffer
+    }
+
+    fn from_buffer(buffer: Vec<u8>) -> Result<Self, Box<dyn std::error::Error>> {
+        let index: u32 = u32::from_be_bytes(buffer[0..4].try_into()?);
+        let begin: u32 = u32::from_be_bytes(buffer[4..8].try_into()?);
+        let block: Vec<u8> = buffer[8..].to_vec();
+
+        Ok(Self {
+            index,
+            begin,
+            block,
+        })
+    }
+}
+
+enum PeerMessage {
+    Choke(),
+    Unchoke(),
+    Interested(),
+    NotInterested(),
+    Have(u32),
+    Bitfield(Bitfield),
+    Request(Request),
+    Piece(Piece),
+    Cancel(Request),
+}
+
+impl PeerMessage {
+    fn serialize_without_payload(id: u8) -> Vec<u8> {
+        let length: i32 = 1;
+        let mut buffer = Vec::new();
+        buffer.extend_from_slice(&length.to_be_bytes());
+        buffer.push(id);
+        buffer
+    }
+
+    fn serialize_with_payload(id: u8, paylaod: Vec<u8>) -> Vec<u8> {
+        let length = 1 + paylaod.len();
+        let mut buffer = Vec::new();
+        buffer.extend_from_slice(&length.to_be_bytes());
+        buffer.push(id);
+        buffer.extend_from_slice(&paylaod);
+        buffer
+    }
+
+    pub fn serialize(self) -> Vec<u8> {
+        match self {
+            PeerMessage::Choke() => Self::serialize_without_payload(0),
+            PeerMessage::Unchoke() => Self::serialize_without_payload(1),
+            PeerMessage::Interested() => Self::serialize_without_payload(2),
+            PeerMessage::NotInterested() => Self::serialize_without_payload(3),
+            PeerMessage::Have(index) => Self::serialize_with_payload(4, index.to_be_bytes().into()),
+            PeerMessage::Bitfield(bitfield) => Self::serialize_with_payload(5, bitfield.payload()),
+            PeerMessage::Request(request) => Self::serialize_with_payload(6, request.payload()),
+            PeerMessage::Piece(piece) => Self::serialize_with_payload(7, piece.payload()),
+            PeerMessage::Cancel(request) => Self::serialize_with_payload(8, request.payload()),
+        }
+    }
+
+    pub fn deserialize(buffer: Vec<u8>) -> Result<Self, Box<dyn std::error::Error>> {
+        let id: u8 = buffer[4];
+        let payload: Vec<u8> = buffer[5..].to_vec();
+
+        match id {
+            0 => Ok(PeerMessage::Choke()),
+            1 => Ok(PeerMessage::Unchoke()),
+            2 => Ok(PeerMessage::Interested()),
+            3 => Ok(PeerMessage::NotInterested()),
+            4 => Ok(PeerMessage::Have(u32::from_be_bytes(
+                buffer[5..9].try_into()?,
+            ))),
+            5 => Ok(PeerMessage::Bitfield(Bitfield::from_buffer(payload))),
+            6 => Ok(PeerMessage::Request(Request::from_buffer(payload)?)),
+            7 => Ok(PeerMessage::Piece(Piece::from_buffer(payload)?)),
+            8 => Ok(PeerMessage::Cancel(Request::from_buffer(payload)?)),
+            _ => Err(format!("unsupported message id {id}").into()),
+        }
+    }
+}
+
 pub struct Handshake {
     reserved: [u8; 8],
     info_hash: [u8; 20],
