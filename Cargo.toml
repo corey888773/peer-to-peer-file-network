@@ -7,3 +7,4 @@ edition = "2024"
 members = ["crates/*"]
 
 [dependencies]
+protocol = { path = "crates/protocol" }

@@ -156,7 +156,7 @@ impl Handshake {
     const PSTRLEN: u8 = 19;
     const PSTR: &[u8] = b"BitTorrent protocol";
 
-    fn new(info_hash: [u8; 20], peer_id: [u8; 20]) -> Self {
+    pub fn new(info_hash: [u8; 20], peer_id: [u8; 20]) -> Self {
         Self {
             reserved: [0u8; 8], // empty according to https://bittorrent.org/beps/bep_0003.html
             info_hash,
@@ -164,7 +164,7 @@ impl Handshake {
         }
     }
 
-    fn serialize(self) -> [u8; 68] {
+    pub fn serialize(self) -> [u8; 68] {
         let mut buffer = [0u8; 68];
         buffer[0] = Self::PSTRLEN;
         buffer[1..=19].copy_from_slice(Self::PSTR);
@@ -174,7 +174,7 @@ impl Handshake {
         buffer
     }
 
-    fn deserialize(buffer: [u8; 68]) -> Result<Self, Box<dyn std::error::Error>> {
+    pub fn deserialize(buffer: [u8; 68]) -> Result<Self, Box<dyn std::error::Error>> {
         Ok(Self {
             reserved: buffer[20..=27].try_into()?,
             info_hash: buffer[28..=47].try_into()?,
