@@ -21,3 +21,5 @@ This is my journal to save my progress and help me keep consistent with it.
 1. Protocol crate
 2. Tcp Handshake
 3. Protocol messgae types and their serialization methods
+- 2025-06-03
+1. Basic handshake integration test
