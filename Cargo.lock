@@ -34,6 +34,9 @@ dependencies = [
 [[package]]
 name = "peer-to-peer-file-network"
 version = "0.1.0"
+dependencies = [
+ "protocol",
+]
 
 [[package]]
 name = "proc-macro2"
@@ -47,6 +50,9 @@ dependencies = [
 [[package]]
 name = "protocol"
 version = "0.1.0"
+dependencies = [
+ "meta",
+]
 
 [[package]]
 name = "quote"
